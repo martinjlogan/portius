@@ -84,7 +84,10 @@ get({http_request, _, {abs_path, AbsPathBin}, _}, Headers, State) ->
 	    end;
 	false ->
 	    get_a_file(RawFilePath, Headers)
-    end.
+    end;
+get(Msg, Headers, State) ->
+    error_logger:info_msg("unhandled request from gen_web_server ~p ~p ~p~n", [Msg, Headers, State]), 
+    {stop, gen_web_server:http_reply(501, ?STD_HEADERS, <<>>), State}.
     
 	    
 head(_RequestLine, _Headers, State)   -> {stop, gen_web_server:http_reply(501, ?STD_HEADERS, <<>>), State}.
@@ -104,7 +107,11 @@ put({http_request, _, {abs_path, AbsPathBin}, _}, _Headers, Body, State) ->
 	Error ->
 	    error_logger:info_msg("failed to write data to ~p with error ~p~n", [To, Error]),
 	    {stop, gen_web_server:http_reply(405, ?STD_HEADERS, <<>>), State}
-    end.
+    end;
+put(Msg, Headers, Body, State) ->
+    error_logger:info_msg("unhandled request from gen_web_server ~p ~p ~p ~p~n", [Msg, Headers, Body, State]), 
+    {stop, gen_web_server:http_reply(501, ?STD_HEADERS, <<>>), State}.
+
 trace(_RequestLine, _Headers, _Body, State)   -> {stop, gen_web_server:http_reply(501, ?STD_HEADERS, <<>>), State}.
 post(_RequestLine, _Headers, _Body, State)    -> {stop, gen_web_server:http_reply(501, ?STD_HEADERS, <<>>), State}.
 options(_RequestLine, _Headers, _Body, State) -> {stop, gen_web_server:http_reply(501, ?STD_HEADERS, <<>>), State}.
